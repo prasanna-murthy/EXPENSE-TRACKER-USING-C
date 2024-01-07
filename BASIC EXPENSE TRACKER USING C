@@ -1,0 +1,99 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_EXPENSES 100
+
+struct Expense {
+    char category[50];
+    float amount;
+};
+
+void addExpense(FILE *file, float *totalBudget);
+void viewExpenses(FILE *file);
+
+int main() {
+    int choice;
+    FILE *file;
+    float totalBudget = 0;
+
+    while (1) {
+        printf("\nExpense Tracker Menu\n");
+        printf("1. Add Expense\n");
+        printf("2. View Expenses\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                addExpense(file, &totalBudget);
+                break;
+            case 2:
+                viewExpenses(file);
+                break;
+            case 3:
+                exit(0);
+            default:
+                printf("Invalid choice. Try again.\n");
+        }
+    }
+
+    return 0;
+}
+
+void addExpense(FILE *file, float *totalBudget) {
+    char month[20];
+    struct Expense expenses[100];
+    int numExpenses;
+
+    printf("Enter the month (e.g., January): ");
+    scanf("%s", month);
+
+
+    file = fopen(month, "a+");
+    if (file == NULL) {
+        printf("Error opening file.\n");
+        exit(1);
+    }
+
+    
+    printf("Enter total budget for %s: ", month);
+    scanf("%f", totalBudget);
+    fprintf(file, "Total Budget: %.2f\n", *totalBudget);
+
+   
+    printf("Enter the number of expenses: ");
+    scanf("%d", &numExpenses);
+
+    for (int i = 0; i < numExpenses; i++) {
+        printf("Enter category for expense %d: ", i + 1);
+        scanf("%s", expenses[i].category);
+
+        printf("Enter amount for expense %d: ", i + 1);
+        scanf("%f", &expenses[i].amount);
+
+   
+        fprintf(file, "%s: %.2f\n", expenses[i].category, expenses[i].amount);
+    }
+
+    fclose(file);
+    printf("Expenses added successfully for %s.\n", month);
+}
+
+void viewExpenses(FILE *file) {
+    char month[20];
+    char line[100];
+
+    printf("Enter the month to view expenses: ");
+    scanf("%s", month);
+    file = fopen(month, "r");
+    if (file == NULL) {
+        printf("File not found. No expenses recorded for %s.\n", month);
+        return;
+    }
+    while (fgets(line, sizeof(line), file)) {
+        printf("%s", line);
+    }
+
+    fclose(file);
+}
